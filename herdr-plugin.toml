@@ -1,0 +1,14 @@
+id = "cmc.athenaeum"
+name = "Athenaeum"
+version = "0.1.0"
+min_herdr_version = "0.7.0"
+description = "Fuzzy cheatsheet of AI agent skills/rules — scoped to the focused pane's agent when one is detected"
+platforms = ["linux", "macos"]
+
+[[panes]]
+id = "list"
+title = "Athenaeum: skills"
+placement = "popup"
+command = ["bash", "list-skills.sh"]
+width = "80%"
+height = "80%"
