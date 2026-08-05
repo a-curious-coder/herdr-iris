@@ -1,7 +1,7 @@
 # Iris
 
 <p align="center">
-  <a href="https://github.com/a-curious-coder/herdr-iris/blob/main/LICENSE"><img src="https://shieldcn.dev/github/license/a-curious-coder/herdr-iris.svg?variant=secondary" alt="License" /></a>
+  <a href="https://github.com/a-curious-coder/herdr-iris/blob/main/LICENSE"><img src="https://shieldcn.dev/badge/license-MIT-4385BE.svg?variant=secondary" alt="License: MIT" /></a>
   <a href="https://herdr.dev"><img src="https://shieldcn.dev/badge/herdr-plugin-4385BE.svg?variant=secondary" alt="herdr plugin" /></a>
   <img src="https://shieldcn.dev/badge/bash-121011.svg?logo=gnu-bash&variant=secondary" alt="Bash" />
   <a href="https://github.com/a-curious-coder/herdr-iris/commits/main"><img src="https://shieldcn.dev/github/last-commit/a-curious-coder/herdr-iris.svg?variant=secondary" alt="Last commit" /></a>
