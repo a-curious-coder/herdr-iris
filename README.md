@@ -1,13 +1,13 @@
-# Athenaeum
+# Iris
 
 <p align="center">
-  <a href="https://github.com/a-curious-coder/athenaeum/blob/main/LICENSE"><img src="https://shieldcn.dev/github/license/a-curious-coder/athenaeum.svg?variant=secondary" alt="License" /></a>
+  <a href="https://github.com/a-curious-coder/herdr-iris/blob/main/LICENSE"><img src="https://shieldcn.dev/github/license/a-curious-coder/herdr-iris.svg?variant=secondary" alt="License" /></a>
   <a href="https://herdr.dev"><img src="https://shieldcn.dev/badge/herdr-plugin-4385BE.svg?variant=secondary" alt="herdr plugin" /></a>
   <img src="https://shieldcn.dev/badge/bash-121011.svg?logo=gnu-bash&variant=secondary" alt="Bash" />
-  <a href="https://github.com/a-curious-coder/athenaeum/commits/main"><img src="https://shieldcn.dev/github/last-commit/a-curious-coder/athenaeum.svg?variant=secondary" alt="Last commit" /></a>
+  <a href="https://github.com/a-curious-coder/herdr-iris/commits/main"><img src="https://shieldcn.dev/github/last-commit/a-curious-coder/herdr-iris.svg?variant=secondary" alt="Last commit" /></a>
 </p>
 
-A [herdr](https://herdr.dev) plugin: a fuzzy cheatsheet of AI agent skills/rules, scoped to the agent running in the pane you opened it from. Named for Athena — goddess of wisdom and skilled craft (*technē*) — and for the word itself, a library or repository of knowledge.
+A [herdr](https://herdr.dev) plugin: a fuzzy cheatsheet of AI agent skills/rules, scoped to the agent running in the pane you opened it from. Named for Iris — messenger goddess of the rainbow, who carries messages between gods and mortals — because that's exactly what it does with a skill's invocation: carries it from the list straight into your pane.
 
 ## What it does
 
@@ -28,14 +28,14 @@ Press a key, get a searchable list of every AI agent skill available to you — 
 ## Install
 
 ```
-herdr plugin install a-curious-coder/athenaeum
+herdr plugin install a-curious-coder/herdr-iris
 ```
 
 ### Local development
 
 ```
-git clone https://github.com/a-curious-coder/athenaeum.git
-herdr plugin link ./athenaeum
+git clone https://github.com/a-curious-coder/herdr-iris.git
+herdr plugin link ./herdr-iris
 ```
 
 ## Usage
@@ -46,8 +46,8 @@ Bind a key to open it, in `~/.config/herdr/config.toml`:
 [[keys.command]]
 key = "prefix+shift+k"
 type = "pane"
-command = "herdr plugin pane open --plugin cmc.athenaeum --entrypoint list --placement popup"
-description = "skills cheatsheet (Athenaeum)"
+command = "herdr plugin pane open --plugin cmc.iris --entrypoint list --placement popup"
+description = "skills cheatsheet (Iris)"
 ```
 
 | Key | Action |
@@ -55,7 +55,7 @@ description = "skills cheatsheet (Athenaeum)"
 | `/` | Start searching (literal substring, not fuzzy) |
 | `?` | Toggle the description preview |
 | `↑`/`↓`, `Ctrl-N`/`Ctrl-P` | Move the selection |
-| `Enter` | Type the selected skill's invocation into the pane you opened Athenaeum from |
+| `Enter` | Type the selected skill's invocation into the pane you opened Iris from |
 | `q`, `Esc` | Close without typing anything |
 
 ## Supported agents
