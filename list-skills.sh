@@ -98,7 +98,7 @@ list_claude() {
       [[ -z "$name" ]] && name=$(basename "$(dirname "$f")")
       desc=$(frontmatter_field "$f" description)
       author=$(author_from_lock "$name")
-      printf 'claude\t%s\t%s\t%s\n' "$name" "$author" "$desc"
+      printf 'claude\t%s\t%s\t%s\t%s\n' "$name" "$author" "$desc" "$f"
     done
   done
   list_claude_plugin_skills
@@ -128,7 +128,7 @@ list_claude_plugin_skills() {
         name=$(frontmatter_field "$f" name)
         [[ -z "$name" ]] && name=$(basename "$(dirname "$f")")
         desc=$(frontmatter_field "$f" description)
-        printf 'claude\t%s:%s\t%s\t%s\n' "$plugin" "$name" "$author" "$desc"
+        printf 'claude\t%s:%s\t%s\t%s\t%s\n' "$plugin" "$name" "$author" "$desc" "$f"
       done
     done
   done < <(jq -r '.enabledPlugins // {} | to_entries[] | select(.value == true) | .key' "$HOME/.claude/settings.json" 2>/dev/null)
@@ -140,7 +140,7 @@ list_cursor() {
     [[ -f "$f" ]] || continue
     name=$(basename "$f" .mdc)
     desc=$(frontmatter_field "$f" description)
-    printf 'cursor\t%s\t-\t%s\n' "$name" "$desc"
+    printf 'cursor\t%s\t-\t%s\t%s\n' "$name" "$desc" "$f"
   done
 }
 
@@ -197,13 +197,21 @@ if command -v fzf >/dev/null 2>&1; then
   # No agent column: when scoped to one agent it's constant (already in the
   # header), and when unscoped it's still tracked in $data_file for the
   # Enter/preview lookups below, just not worth a visible column.
+  # 'o' opens the skill's file in $VISUAL/$EDITOR (falls back to vi) via
+  # fzf's execute() — switches to the alternate screen for the editor, then
+  # returns to this same list once it exits (nvim's normal quit, no special
+  # handling needed). Editing SKILL.md and coming back needs no refresh:
+  # Claude Code watches its skill directories and picks up the change within
+  # the current session, confirmed in code.claude.com/docs/en/skills's own
+  # "Live change detection" section — no plumbing needed on Iris's side.
   sel=$(printf '%s\n' "$rows" \
     | awk -F'\t' '{printf "%-14s  %s\n", $3, $2}' \
-    | fzf --header="Athenaeum${focused_agent:+ · $focused_agent} · / to search author+name · ? to hide description" \
+    | fzf --header="Athenaeum${focused_agent:+ · $focused_agent} · / to search author+name · ? to hide description · o to edit" \
           --prompt="/" --no-sort --exact --layout=reverse-list --no-input \
           --bind='q:abort' \
           --bind='/:show-input+enable-search+clear-query+rebind(q)' \
           --bind='?:toggle-preview' \
+          --bind="o:execute(bash '$script_dir/open-skill.sh' '$data_file' {2} {1})" \
           --preview="bash '$script_dir/preview.sh' '$data_file' {2} {1}" \
           --preview-window='right:50%') || true
 
