@@ -7,25 +7,28 @@
   <a href="https://github.com/a-curious-coder/herdr-iris/commits/main"><img src="https://shieldcn.dev/github/last-commit/a-curious-coder/herdr-iris.svg?variant=secondary" alt="Last commit" /></a>
 </p>
 
-A [herdr](https://herdr.dev) plugin: a fuzzy cheatsheet of AI agent skills/rules, scoped to the agent running in the pane you opened it from. Named for Iris — messenger goddess of the rainbow, who carries messages between gods and mortals — because that's exactly what it does with a skill's invocation: carries it from the list straight into your pane.
+Iris is a plugin for [herdr](https://herdr.dev). Iris shows a searchable list of your AI agent skills. Iris types the skill you select into your pane.
 
-## What it does
+The name comes from Iris, the Greek messenger goddess. Iris carries a skill's name from the list into your pane, the same way.
 
-Press a key, get a searchable list of every AI agent skill available to you — name and full description — filtered to whichever agent herdr detects on the pane you're in. Select one and it types the invocation straight into that pane.
+## What Iris does
 
-- **Scoped by agent.** If herdr reports the focused pane's agent (e.g. `claude`), only that agent's skills show. If it can't detect one, every agent with a known skill source shows, grouped.
-- **Reads real sources, not guesses.** Claude Code's `SKILL.md` frontmatter (personal `~/.claude/skills`, project-local `.claude/skills`, and every *enabled* plugin's bundled skills, correctly namespaced as `plugin-name:skill-name`) and Cursor's `.cursor/rules/*.mdc`. Every other agent herdr recognizes gets no entry at all rather than a guessed-at file format — no filler rows for agents with nothing to show.
-- **Vim-like search, by name or author.** Nothing types into the query box until you press `/`. Search is literal substring matching, not fuzzy, and matches against both the skill's name and its author.
-- **Author, sourced from real data, not a frontmatter convention that doesn't exist.** For personal skills: the skill-installer tool's own lock file (`~/.agents/.skill-lock.json`), if the skill came from an external repo — no entry means self-authored ("you"). For plugin skills: the plugin's declared marketplace source repo.
-- **Full descriptions, properly wrapped.** Shown by default in a preview pane, word-wrapped to the pane's actual width — including multi-line YAML block-scalar (`description: >`) frontmatter, which is how most plugin-bundled skills write theirs.
-- **Edit in place with `o`, reload with `ctrl-r`.** `o` opens the skill's file in your editor in the same pane, no extra window. Claude itself needs no refresh — it watches its skill directories and picks up `SKILL.md` edits within the current session on its own (confirmed in [its own docs](https://code.claude.com/docs/en/skills)) — but Iris's *own list* is a snapshot, so `ctrl-r` regenerates it without closing the popup, in case you renamed something or want the fresh description.
-- **Enter types it for you.** Selecting a skill sends its invocation (`/name` for Claude, `$name` for Codex) as literal text into the originating pane — it doesn't press Enter for you, so you always get a chance to review before running it.
-- **Respects `skillOverrides`.** A skill set to `"off"` (via the `/skills` menu or settings directly) is hidden from Claude's own `/` menu and errors if invoked anyway — Iris checks the same setting (project settings before global) and never lists or types one out. `"user-invocable-only"` skills still show, since a human typing `/name` is exactly what that state is for.
+Press a key. Iris opens a list of skills. The list shows the skills for the agent in your pane. Select a skill. Iris types the skill into that pane.
+
+- **Iris scopes the list to your agent.** herdr reports which agent runs in your pane, for example `claude`. Iris shows only that agent's skills. If herdr reports no agent, Iris shows every agent's skills, grouped by agent.
+- **Iris reads real skill files, not guesses.** For Claude Code, Iris reads `SKILL.md` frontmatter. Iris reads three sources: your personal skills folder (`~/.claude/skills`), the current project's skills folder (`.claude/skills`), and every enabled plugin's skills. Iris marks each plugin skill with its plugin name, for example `plugin-name:skill-name`. For Cursor, Iris reads `.cursor/rules/*.mdc` frontmatter. For every other agent herdr recognizes, Iris shows nothing. Iris does not guess at a file format it has not confirmed.
+- **Search is literal, not fuzzy.** Press `/` to start a search. Before you press `/`, no key types into the search box. Iris matches your search text against the skill's name and its author, as plain substrings.
+- **Iris shows a real author, not a guess.** SKILL.md has no author field. Iris does not read an author field from a skill file. For a personal skill, Iris checks the skill-installer tool's own record (`~/.agents/.skill-lock.json`). If that record names a source repo, Iris shows the repo owner as the author. If not, Iris shows "you". For a plugin skill, Iris shows the owner of the plugin's marketplace repo.
+- **Iris shows the full description, wrapped to fit.** The description shows by default, in a preview pane next to the list. Iris wraps the text at whole words, to the preview pane's real width. Iris also reads a multi-line YAML description (`description: >`), which most plugin skills use.
+- **Press `o` to edit a skill.** Iris opens the skill's file in your editor (`$VISUAL`, then `$EDITOR`, then `vi`). Close the editor. Iris shows the list again. Claude Code does not need a restart to see your edit. Claude Code watches its skill folders. Claude Code reads a changed `SKILL.md` file during the same session. This is documented behavior, not a guess (see [Claude Code's skills docs](https://code.claude.com/docs/en/skills)).
+- **Press `Ctrl-R` to reload the list.** Iris built its list once, when you opened it. Iris does not update that list on its own. Press `Ctrl-R` after you edit, rename, or add a skill, to see the change in the list.
+- **Press `Enter` to type the skill into your pane.** Iris adds the right prefix for the agent: `/` for Claude, `$` for Codex. Iris types this text into the pane you opened Iris from. Iris does not press Enter for you. You choose when to run it.
+- **Iris hides a skill you turned off.** Claude Code hides a skill set to `"off"` in `skillOverrides`. Claude Code also refuses to run that skill by name. Iris checks the same setting before it builds the list. Iris checks your project settings first, then your personal settings. Iris hides an "off" skill the same way. Iris still shows a skill set to `"user-invocable-only"`. That setting exists for a person to type the skill's name by hand.
 
 ## Requirements
 
-- [herdr](https://herdr.dev) 0.7.0+
-- [fzf](https://github.com/junegunn/fzf) and [jq](https://jqlang.org) — installed automatically via Homebrew/apt/dnf/pacman when you run `herdr plugin install` (see `install-deps.sh`), so there's nothing to set up by hand. If none of those package managers are found, install fails with a one-line instruction instead of silently proceeding broken. Without fzf specifically, Iris still works, just as a plain listing (no search/preview/Enter-to-type).
+- [herdr](https://herdr.dev), version 0.7.0 or later.
+- [fzf](https://github.com/junegunn/fzf) and [jq](https://jqlang.org). `herdr plugin install` installs both for you, through Homebrew, apt, dnf, or pacman (see `install-deps.sh`). If none of these tools are on your machine, install stops and shows you the one command to run by hand. Without fzf, Iris still shows the list, as plain text. Without fzf, search, the preview, edit, reload, and type-to-pane do not work.
 
 ## Install
 
@@ -42,7 +45,7 @@ herdr plugin link ./herdr-iris
 
 ## Usage
 
-Bind a key to open it, in `~/.config/herdr/config.toml`:
+Add a key binding in `~/.config/herdr/config.toml`:
 
 ```toml
 [[keys.command]]
@@ -54,24 +57,24 @@ description = "skills cheatsheet (Iris)"
 
 | Key | Action |
 |---|---|
-| `/` | Start searching by name or author (literal substring, not fuzzy) |
-| `?` | Toggle the description preview |
-| `o` | Open the skill's file in `$VISUAL`/`$EDITOR` (falls back to `vi`); returns to the list on exit |
-| `Ctrl-R` | Reload the list from disk (e.g. after editing a skill with `o`) |
-| `↑`/`↓`, `Ctrl-N`/`Ctrl-P` | Move the selection |
-| `Enter` | Type the selected skill's invocation into the pane you opened Iris from |
-| `q`, `Esc` | Close without typing anything |
+| `/` | Start a search, by name or author (literal text, not fuzzy) |
+| `?` | Show or hide the description preview |
+| `o` | Open the skill's file in your editor. Close the editor to return to the list |
+| `Ctrl-R` | Rebuild the list from disk |
+| `↑`/`↓`, `Ctrl-N`/`Ctrl-P` | Move the selection up or down |
+| `Enter` | Type the selected skill into the pane you opened Iris from |
+| `q`, `Esc` | Close Iris. Type nothing |
 
 ## Supported agents
 
-| Agent | Source | Status |
+| Agent | Skill source | Status |
 |---|---|---|
-| Claude Code | `SKILL.md` frontmatter — personal, project-local, and enabled plugins | Full support |
-| Cursor | `.cursor/rules/*.mdc` frontmatter | Best-effort |
-| Everything else herdr recognizes (codex, gemini, opencode, copilot, cline, devin, droid, amp, grok, kimi, kiro, kilo, qoder, qodercli, pi, hermes) | — | No verified skills-file convention yet — contributes nothing rather than a guess |
+| Claude Code | `SKILL.md` frontmatter: personal, project, and enabled plugins | Full support |
+| Cursor | `.cursor/rules/*.mdc` frontmatter | Best effort |
+| Every other agent herdr recognizes (codex, gemini, opencode, copilot, cline, devin, droid, amp, grok, kimi, kiro, kilo, qoder, qodercli, pi, hermes) | None found | No confirmed skill file format yet |
 
-Adding a new agent is one function: a `list_<agent>` function plus a matching `case` arm in `list-skills.sh`.
+To add a new agent: write a `list_<agent>` function in `build-rows.sh`. Add a matching case to `collect_for`.
 
 ## License
 
-[MIT](LICENSE)
+Iris uses the [MIT license](LICENSE).
