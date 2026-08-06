@@ -18,8 +18,9 @@ Press a key, get a searchable list of every AI agent skill available to you — 
 - **Vim-like search, by name or author.** Nothing types into the query box until you press `/`. Search is literal substring matching, not fuzzy, and matches against both the skill's name and its author.
 - **Author, sourced from real data, not a frontmatter convention that doesn't exist.** For personal skills: the skill-installer tool's own lock file (`~/.agents/.skill-lock.json`), if the skill came from an external repo — no entry means self-authored ("you"). For plugin skills: the plugin's declared marketplace source repo.
 - **Full descriptions, properly wrapped.** Shown by default in a preview pane, word-wrapped to the pane's actual width — including multi-line YAML block-scalar (`description: >`) frontmatter, which is how most plugin-bundled skills write theirs.
-- **Edit in place with `o`.** Opens the skill's file in your editor, in the same pane, no extra window. Editing and coming back needs no manual refresh — Claude Code watches its skill directories and picks up the change within the current session on its own (confirmed in [its own docs](https://code.claude.com/docs/en/skills)).
+- **Edit in place with `o`, reload with `ctrl-r`.** `o` opens the skill's file in your editor in the same pane, no extra window. Claude itself needs no refresh — it watches its skill directories and picks up `SKILL.md` edits within the current session on its own (confirmed in [its own docs](https://code.claude.com/docs/en/skills)) — but Iris's *own list* is a snapshot, so `ctrl-r` regenerates it without closing the popup, in case you renamed something or want the fresh description.
 - **Enter types it for you.** Selecting a skill sends its invocation (`/name` for Claude, `$name` for Codex) as literal text into the originating pane — it doesn't press Enter for you, so you always get a chance to review before running it.
+- **Respects `skillOverrides`.** A skill set to `"off"` (via the `/skills` menu or settings directly) is hidden from Claude's own `/` menu and errors if invoked anyway — Iris checks the same setting (project settings before global) and never lists or types one out. `"user-invocable-only"` skills still show, since a human typing `/name` is exactly what that state is for.
 
 ## Requirements
 
@@ -56,6 +57,7 @@ description = "skills cheatsheet (Iris)"
 | `/` | Start searching by name or author (literal substring, not fuzzy) |
 | `?` | Toggle the description preview |
 | `o` | Open the skill's file in `$VISUAL`/`$EDITOR` (falls back to `vi`); returns to the list on exit |
+| `Ctrl-R` | Reload the list from disk (e.g. after editing a skill with `o`) |
 | `↑`/`↓`, `Ctrl-N`/`Ctrl-P` | Move the selection |
 | `Enter` | Type the selected skill's invocation into the pane you opened Iris from |
 | `q`, `Esc` | Close without typing anything |
