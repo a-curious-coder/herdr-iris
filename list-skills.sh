@@ -164,7 +164,7 @@ else
   done
 fi
 
-rows=$(printf '%s\n' "$rows" | sed '/^$/d' | sort -t $'\t' -k2,2)
+rows=$(printf '%s\n' "$rows" | sed '/^$/d' | sort -t $'\t' -k3,3 -k2,2)
 
 if [[ -z "$rows" ]]; then
   echo "No skills found${focused_agent:+ for agent '$focused_agent'}."
