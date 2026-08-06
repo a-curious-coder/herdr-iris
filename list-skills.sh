@@ -8,14 +8,12 @@ script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 # --- 1. Which pane opened us, and which agent (if any) owns it? ------------
 # ponytail: placement="popup" panes never receive $HERDR_PANE_ID (confirmed
-# against herdr.dev/docs/plugins/ — a popup "has no pane ID"). The context
-# JSON's `focused_pane_id` looked promising but proved unreliable in
-# practice — it returned a pane ID that didn't exist in `herdr pane list`
-# on two separate live runs (pane_not_found), so it's demoted to a logged
-# fallback only. Primary source: `herdr pane list`'s own `.focused == true`
-# row — herdr's docs guarantee a popup "does not change plugin focus
-# context", so the pane you pressed the key from stays marked focused for
-# as long as the popup is open.
+# against herdr.dev/docs/plugins/ — a popup "has no pane ID"), and the
+# context JSON's `focused_pane_id` proved unreliable (returned pane IDs
+# that didn't exist in `herdr pane list` on two separate live runs). So:
+# `herdr pane list`'s own `.focused == true` row is the only source —
+# herdr's docs guarantee a popup "does not change plugin focus context",
+# so the pane you pressed the key from stays marked focused throughout.
 origin_pane=""
 origin_cwd=""
 if command -v herdr >/dev/null 2>&1; then
@@ -24,17 +22,6 @@ if command -v herdr >/dev/null 2>&1; then
   [[ -n "$origin_pane" ]] && origin_cwd=$(jq -r --arg pid "$origin_pane" \
     '.result.panes[]? | select(.pane_id == $pid) | (.foreground_cwd // .cwd // empty)' <<<"$panes_json" 2>/dev/null || true)
 fi
-
-state_dir="${HERDR_PLUGIN_STATE_DIR:-${TMPDIR:-/tmp}}"
-if [[ -n "${HERDR_PLUGIN_CONTEXT_JSON:-}" ]]; then
-  printf '%s\n' "$HERDR_PLUGIN_CONTEXT_JSON" > "$state_dir/last-context.json" 2>/dev/null || true
-fi
-{
-  echo "origin_pane(focused)=[$origin_pane] HERDR_PANE_ID=[${HERDR_PANE_ID:-}]"
-  echo "context focused_pane_id=[$(jq -r '.focused_pane_id // empty' <<<"${HERDR_PLUGIN_CONTEXT_JSON:-}" 2>/dev/null)]"
-} > "$state_dir/last-origin.log" 2>/dev/null || true
-
-origin_pane="${HERDR_PANE_ID:-$origin_pane}"
 
 # herdr pane list gives every pane's .agent field (confirmed via `herdr pane
 # list` — see docs/plugins/ for the runtime env vars this reads).
@@ -55,11 +42,6 @@ fi
 # skills convention worth reading.
 
 cwd="$origin_cwd"
-if [[ -z "$cwd" && -n "$focused_agent" && -n "$origin_pane" ]]; then
-  cwd=$(herdr pane list 2>/dev/null \
-    | jq -r --arg pid "$origin_pane" \
-      '.result.panes[]? | select(.pane_id == $pid) | (.foreground_cwd // .cwd // empty)' 2>/dev/null || true)
-fi
 
 # Handles both `field: value` on one line and a `field: >`/`field: |` block
 # scalar (folds continuation lines into one line — every ponytail plugin
@@ -206,22 +188,13 @@ if command -v fzf >/dev/null 2>&1; then
           --preview="bash '$script_dir/preview.sh' '$data_file' {1} {2}" \
           --preview-window='right:50%') || true
 
-  debug_log="${HERDR_PLUGIN_STATE_DIR:-${TMPDIR:-/tmp}}/last-send.log"
   if [[ -n "${sel:-}" ]]; then
     agent=$(awk '{print $1}' <<<"$sel")
     name=$(awk '{print $2}' <<<"$sel")
     prefix=$(prefix_for_agent "$agent")
-    {
-      echo "sel=[$sel] agent=[$agent] name=[$name] prefix=[$prefix] origin_pane=[$origin_pane]"
-      if [[ -n "$prefix" && -n "$origin_pane" ]]; then
-        herdr pane send-text "$origin_pane" "${prefix}${name}"
-        echo "send-text exit=$?"
-      else
-        echo "skipped: prefix or origin_pane empty"
-      fi
-    } > "$debug_log" 2>&1 || true
-  else
-    echo "sel was empty (aborted/no selection)" > "$debug_log" 2>&1 || true
+    if [[ -n "$prefix" && -n "$origin_pane" ]]; then
+      herdr pane send-text "$origin_pane" "${prefix}${name}" >/dev/null 2>&1 || true
+    fi
   fi
 else
   printf '%s\n' "$rows" | awk -F'\t' '{printf "%-8s  %-28s  %s\n", $1, $2, $3}'
