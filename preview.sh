@@ -5,7 +5,7 @@
 # because fzf's own --preview-window wrap is a character wrap, not a word
 # wrap, and was cutting words in half mid-line.
 data_file="$1"
-agent="$2"
-name="$3"
-desc=$(awk -F'\t' -v a="$agent" -v n="$name" '$1 == a && $2 == n { print $4; exit }' "$data_file")
+name="$2"
+author="$3"
+desc=$(awk -F'\t' -v n="$name" -v a="$author" '$2 == n && $3 == a { print $4; exit }' "$data_file")
 printf '%s' "$desc" | fmt -w "${FZF_PREVIEW_COLUMNS:-60}"

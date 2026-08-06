@@ -194,19 +194,23 @@ if command -v fzf >/dev/null 2>&1; then
   # layout=reverse-list keeps the list top-down (a→z at top) while the
   # prompt itself stays pinned to the bottom of the screen, like vim's own
   # '/' command line, instead of a boxed search bar up top.
+  # No agent column: when scoped to one agent it's constant (already in the
+  # header), and when unscoped it's still tracked in $data_file for the
+  # Enter/preview lookups below, just not worth a visible column.
   sel=$(printf '%s\n' "$rows" \
-    | awk -F'\t' '{printf "%-8s  %-28s  %s\n", $1, $2, $3}' \
-    | fzf --header="Athenaeum${focused_agent:+ · $focused_agent} · / to search name+author · ? to hide description" \
-          --prompt="/" --no-sort --exact --layout=reverse-list --no-input --nth=2,3 \
+    | awk -F'\t' '{printf "%-14s  %s\n", $3, $2}' \
+    | fzf --header="Athenaeum${focused_agent:+ · $focused_agent} · / to search author+name · ? to hide description" \
+          --prompt="/" --no-sort --exact --layout=reverse-list --no-input \
           --bind='q:abort' \
           --bind='/:show-input+enable-search+clear-query+rebind(q)' \
           --bind='?:toggle-preview' \
-          --preview="bash '$script_dir/preview.sh' '$data_file' {1} {2}" \
+          --preview="bash '$script_dir/preview.sh' '$data_file' {2} {1}" \
           --preview-window='right:50%') || true
 
   if [[ -n "${sel:-}" ]]; then
-    agent=$(awk '{print $1}' <<<"$sel")
+    author=$(awk '{print $1}' <<<"$sel")
     name=$(awk '{print $2}' <<<"$sel")
+    agent=$(awk -F'\t' -v n="$name" -v a="$author" '$2 == n && $3 == a { print $1; exit }' "$data_file")
     prefix=$(prefix_for_agent "$agent")
     if [[ -n "$prefix" && -n "$origin_pane" ]]; then
       herdr pane send-text "$origin_pane" "${prefix}${name}" >/dev/null 2>&1 || true
