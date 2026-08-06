@@ -5,6 +5,9 @@ min_herdr_version = "0.7.0"
 description = "Fuzzy cheatsheet of AI agent skills/rules — scoped to the focused pane's agent when one is detected"
 platforms = ["linux", "macos"]
 
+[[build]]
+command = ["bash", "install-deps.sh"]
+
 [[panes]]
 id = "list"
 title = "Iris: skills"

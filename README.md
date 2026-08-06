@@ -23,8 +23,7 @@ Press a key, get a searchable list of every AI agent skill available to you — 
 ## Requirements
 
 - [herdr](https://herdr.dev) 0.7.0+
-- [fzf](https://github.com/junegunn/fzf) — falls back to a plain listing if missing, but you lose search/preview/Enter-to-type
-- [jq](https://jqlang.org)
+- [fzf](https://github.com/junegunn/fzf) and [jq](https://jqlang.org) — installed automatically via Homebrew/apt/dnf/pacman when you run `herdr plugin install` (see `install-deps.sh`), so there's nothing to set up by hand. If none of those package managers are found, install fails with a one-line instruction instead of silently proceeding broken. Without fzf specifically, Iris still works, just as a plain listing (no search/preview/Enter-to-type).
 
 ## Install
 
