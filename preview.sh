@@ -7,5 +7,5 @@
 data_file="$1"
 agent="$2"
 name="$3"
-desc=$(awk -F'\t' -v a="$agent" -v n="$name" '$1 == a && $2 == n { print $3; exit }' "$data_file")
+desc=$(awk -F'\t' -v a="$agent" -v n="$name" '$1 == a && $2 == n { print $4; exit }' "$data_file")
 printf '%s' "$desc" | fmt -w "${FZF_PREVIEW_COLUMNS:-60}"

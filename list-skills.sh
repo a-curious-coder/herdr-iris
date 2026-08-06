@@ -75,6 +75,18 @@ frontmatter_field() { # $1 file, $2 field name -> prints value
   ' "$1"
 }
 
+# Author isn't a SKILL.md frontmatter field Claude Code defines — there's no
+# convention to read. Instead: cross-reference the skill-installer tool's own
+# lock file (personal skills pulled from an external repo) and, for plugin
+# skills, the marketplace's declared source repo. No entry in either means
+# self-authored, not "unknown" — most personal skills are exactly that.
+SKILL_LOCK_FILE="$HOME/.agents/.skill-lock.json"
+author_from_lock() { # $1 skill name -> prints "owner" or "you"
+  local source=""
+  [[ -f "$SKILL_LOCK_FILE" ]] && source=$(jq -r --arg n "$1" '.skills[$n].source // empty' "$SKILL_LOCK_FILE" 2>/dev/null)
+  [[ -n "$source" ]] && echo "${source%%/*}" || echo "you"
+}
+
 list_claude() {
   local dirs=("$HOME/.claude/skills")
   [[ -n "$cwd" && -d "$cwd/.claude/skills" ]] && dirs+=("$cwd/.claude/skills")
@@ -85,7 +97,8 @@ list_claude() {
       name=$(frontmatter_field "$f" name)
       [[ -z "$name" ]] && name=$(basename "$(dirname "$f")")
       desc=$(frontmatter_field "$f" description)
-      printf 'claude\t%s\t%s\n' "$name" "$desc"
+      author=$(author_from_lock "$name")
+      printf 'claude\t%s\t%s\t%s\n' "$name" "$author" "$desc"
     done
   done
   list_claude_plugin_skills
@@ -99,9 +112,12 @@ list_claude() {
 # skills, not a collision to resolve). Only enabled plugins are scanned.
 list_claude_plugin_skills() {
   [[ -f "$HOME/.claude/settings.json" ]] || return 0
-  local plugin marketplace dir f name desc
+  local plugin marketplace repo author dir f name desc
   while IFS='@' read -r plugin marketplace; do
     [[ -n "$plugin" && -n "$marketplace" ]] || continue
+    repo=$(jq -r --arg m "$marketplace" '.extraKnownMarketplaces[$m].source.repo // empty' "$HOME/.claude/settings.json" 2>/dev/null)
+    author="${repo%%/*}"
+    [[ -z "$author" ]] && author="$marketplace"
     for dir in \
       "$HOME/.claude/plugins/marketplaces/$marketplace/skills" \
       "$HOME/.claude/plugins/marketplaces/$marketplace/plugins/$plugin/skills"
@@ -112,7 +128,7 @@ list_claude_plugin_skills() {
         name=$(frontmatter_field "$f" name)
         [[ -z "$name" ]] && name=$(basename "$(dirname "$f")")
         desc=$(frontmatter_field "$f" description)
-        printf 'claude\t%s:%s\t%s\n' "$plugin" "$name" "$desc"
+        printf 'claude\t%s:%s\t%s\t%s\n' "$plugin" "$name" "$author" "$desc"
       done
     done
   done < <(jq -r '.enabledPlugins // {} | to_entries[] | select(.value == true) | .key' "$HOME/.claude/settings.json" 2>/dev/null)
@@ -124,7 +140,7 @@ list_cursor() {
     [[ -f "$f" ]] || continue
     name=$(basename "$f" .mdc)
     desc=$(frontmatter_field "$f" description)
-    printf 'cursor\t%s\t%s\n' "$name" "$desc"
+    printf 'cursor\t%s\t-\t%s\n' "$name" "$desc"
   done
 }
 
@@ -179,9 +195,9 @@ if command -v fzf >/dev/null 2>&1; then
   # prompt itself stays pinned to the bottom of the screen, like vim's own
   # '/' command line, instead of a boxed search bar up top.
   sel=$(printf '%s\n' "$rows" \
-    | awk -F'\t' '{printf "%-8s  %s\n", $1, $2}' \
-    | fzf --header="Athenaeum${focused_agent:+ · $focused_agent} · / to search · ? to hide description" \
-          --prompt="/" --no-sort --exact --layout=reverse-list --no-input --nth=2 \
+    | awk -F'\t' '{printf "%-8s  %-28s  %s\n", $1, $2, $3}' \
+    | fzf --header="Athenaeum${focused_agent:+ · $focused_agent} · / to search name+author · ? to hide description" \
+          --prompt="/" --no-sort --exact --layout=reverse-list --no-input --nth=2,3 \
           --bind='q:abort' \
           --bind='/:show-input+enable-search+clear-query+rebind(q)' \
           --bind='?:toggle-preview' \
@@ -197,6 +213,6 @@ if command -v fzf >/dev/null 2>&1; then
     fi
   fi
 else
-  printf '%s\n' "$rows" | awk -F'\t' '{printf "%-8s  %-28s  %s\n", $1, $2, $3}'
+  printf '%s\n' "$rows" | awk -F'\t' '{printf "%-8s  %-28s  %-14s  %s\n", $1, $2, $3, $4}'
   read -r -p "Press enter to close..." _
 fi

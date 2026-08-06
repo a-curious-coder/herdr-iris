@@ -15,7 +15,8 @@ Press a key, get a searchable list of every AI agent skill available to you — 
 
 - **Scoped by agent.** If herdr reports the focused pane's agent (e.g. `claude`), only that agent's skills show. If it can't detect one, every agent with a known skill source shows, grouped.
 - **Reads real sources, not guesses.** Claude Code's `SKILL.md` frontmatter (personal `~/.claude/skills`, project-local `.claude/skills`, and every *enabled* plugin's bundled skills, correctly namespaced as `plugin-name:skill-name`) and Cursor's `.cursor/rules/*.mdc`. Every other agent herdr recognizes gets no entry at all rather than a guessed-at file format — no filler rows for agents with nothing to show.
-- **Vim-like search.** Nothing types into the query box until you press `/`. Search is literal substring matching, not fuzzy.
+- **Vim-like search, by name or author.** Nothing types into the query box until you press `/`. Search is literal substring matching, not fuzzy, and matches against both the skill's name and its author.
+- **Author, sourced from real data, not a frontmatter convention that doesn't exist.** For personal skills: the skill-installer tool's own lock file (`~/.agents/.skill-lock.json`), if the skill came from an external repo — no entry means self-authored ("you"). For plugin skills: the plugin's declared marketplace source repo.
 - **Full descriptions, properly wrapped.** Shown by default in a preview pane, word-wrapped to the pane's actual width — including multi-line YAML block-scalar (`description: >`) frontmatter, which is how most plugin-bundled skills write theirs.
 - **Enter types it for you.** Selecting a skill sends its invocation (`/name` for Claude, `$name` for Codex) as literal text into the originating pane — it doesn't press Enter for you, so you always get a chance to review before running it.
 
@@ -52,7 +53,7 @@ description = "skills cheatsheet (Iris)"
 
 | Key | Action |
 |---|---|
-| `/` | Start searching (literal substring, not fuzzy) |
+| `/` | Start searching by name or author (literal substring, not fuzzy) |
 | `?` | Toggle the description preview |
 | `↑`/`↓`, `Ctrl-N`/`Ctrl-P` | Move the selection |
 | `Enter` | Type the selected skill's invocation into the pane you opened Iris from |
