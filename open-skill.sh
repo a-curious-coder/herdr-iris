@@ -1,5 +1,5 @@
 #!/bin/bash
-# Athenaeum: open the selected skill's file in the user's editor.
+# Iris: open the selected skill's file in the user's editor.
 # Invoked by fzf's execute() (bound to 'o') — fzf switches to the alternate
 # screen for this, so a full-screen editor like nvim works normally, and
 # fzf resumes the same list on its own once the editor exits.

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Athenaeum: fuzzy cheatsheet of AI agent skills/rules.
+# Iris: fuzzy cheatsheet of AI agent skills/rules.
 # Scoped to the focused pane's detected agent when herdr reports one;
 # otherwise lists every agent's skills, grouped and labelled.
 set -euo pipefail
@@ -183,7 +183,7 @@ prefix_for_agent() {
 }
 
 if command -v fzf >/dev/null 2>&1; then
-  data_file=$(mktemp "${TMPDIR:-/tmp}/athenaeum-rows.XXXXXX")
+  data_file=$(mktemp "${TMPDIR:-/tmp}/iris-rows.XXXXXX")
   trap 'rm -f "$data_file"' EXIT
   printf '%s\n' "$rows" > "$data_file"
 
@@ -206,7 +206,7 @@ if command -v fzf >/dev/null 2>&1; then
   # "Live change detection" section — no plumbing needed on Iris's side.
   sel=$(printf '%s\n' "$rows" \
     | awk -F'\t' '{printf "%-14s  %s\n", $3, $2}' \
-    | fzf --header="Athenaeum${focused_agent:+ · $focused_agent} · / to search author+name · ? to hide description · o to edit" \
+    | fzf --header="Iris${focused_agent:+ · $focused_agent} · / to search author+name · ? to hide description · o to edit" \
           --prompt="/" --no-sort --exact --layout=reverse-list --no-input \
           --bind='q:abort' \
           --bind='/:show-input+enable-search+clear-query+rebind(q)' \
