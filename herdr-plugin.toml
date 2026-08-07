@@ -8,6 +8,16 @@ platforms = ["linux", "macos"]
 [[build]]
 command = ["bash", "install-deps.sh"]
 
+# The user-facing entry point. Herdr qualifies it globally as `cmc.iris.open`.
+# Bind this in config.toml (type = "plugin_action"), not the `list` pane below
+# directly — plugin_action commands run through the server's own dispatch and
+# get $HERDR_BIN_PATH, so they don't depend on `herdr` being on the user's PATH.
+[[actions]]
+id = "open"
+title = "Skills cheatsheet (Iris)"
+contexts = ["workspace"]
+command = ["bash", "open.sh"]
+
 [[panes]]
 id = "list"
 title = "Iris: skills"

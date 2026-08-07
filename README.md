@@ -51,8 +51,8 @@ Add a key binding in `~/.config/herdr/config.toml`:
 ```toml
 [[keys.command]]
 key = "prefix+shift+k"
-type = "pane"
-command = "herdr plugin pane open --plugin cmc.iris --entrypoint list --placement popup"
+type = "plugin_action"
+command = "cmc.iris.open"
 description = "skills cheatsheet (Iris)"
 ```
 
