@@ -1,6 +1,12 @@
 id = "cmc.iris"
 name = "Iris"
-version = "0.1.0"
+# Semver, bumped at push time (not per-commit) — `herdr plugin install`
+# pins by git commit SHA, not this field, so it's a human signal only, not
+# load-bearing. While 0.x: minor for anything that changes what a user
+# sees (new capability, new message, changed default), patch for a
+# fix/perf change with no new observable capability, no bump for
+# docs/tests/internal-only refactors.
+version = "0.2.0"
 min_herdr_version = "0.7.0"
 description = "Fuzzy cheatsheet of AI agent skills/rules — scoped to the focused pane's agent when one is detected"
 platforms = ["linux", "macos"]
