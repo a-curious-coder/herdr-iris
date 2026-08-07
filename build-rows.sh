@@ -7,7 +7,7 @@ set -euo pipefail
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 # --- 1. Which pane opened us, and which agent (if any) owns it? ------------
-IFS=$'\t' read -r origin_pane focused_agent origin_cwd < <(bash "$script_dir/detect-origin.sh")
+IFS=$'\x1f' read -r origin_pane focused_agent origin_cwd _ < <(bash "$script_dir/detect-origin.sh")
 
 # --- 2. Per-agent skill sources ---------------------------------------------
 # ponytail: only Claude (SKILL.md frontmatter) and Cursor (.mdc rule

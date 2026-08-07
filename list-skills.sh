@@ -5,12 +5,25 @@
 set -euo pipefail
 
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+source "$script_dir/skill-row.sh"
 
-IFS=$'\t' read -r origin_pane focused_agent _ < <(bash "$script_dir/detect-origin.sh")
+IFS=$'\x1f' read -r origin_pane focused_agent _ reason < <(bash "$script_dir/detect-origin.sh")
 rows=$(bash "$script_dir/build-rows.sh")
 
+# Maps detect-origin.sh's reason slug to header text. Empty reason (the
+# common case — detection worked, whether scoped or not) means no prefix.
+reason_message() {
+  case "$1" in
+    no-herdr) printf 'herdr not found' ;;
+    no-jq) printf 'jq not found' ;;
+    no-focused-pane) printf "couldn't detect the origin pane" ;;
+  esac
+}
+degraded=""
+[[ -n "$reason" ]] && degraded=" · degraded: $(reason_message "$reason")"
+
 if [[ -z "$rows" ]]; then
-  echo "No skills found${focused_agent:+ for agent '$focused_agent'}."
+  echo "No skills found${focused_agent:+ for agent '$focused_agent'}.${degraded}"
   read -r -p "Press enter to close..." _
   exit 0
 fi
@@ -51,7 +64,7 @@ if command -v fzf >/dev/null 2>&1; then
   # is purely so *Iris's own list* stops showing what's now a stale snapshot.)
   sel=$(printf '%s\n' "$rows" \
     | awk -F'\t' '{printf "%-14s  %s\n", $3, $2}' \
-    | fzf --header="Iris${focused_agent:+ · $focused_agent} · / to search author+name · ? description · o edit · ctrl-r reload" \
+    | fzf --header="Iris${focused_agent:+ · $focused_agent}${degraded} · / to search author+name · ? description · o edit · ctrl-r reload" \
           --prompt="/" --no-sort --exact --layout=reverse-list --no-input \
           --bind='q:abort' \
           --bind='/:show-input+enable-search+clear-query+rebind(q)' \
