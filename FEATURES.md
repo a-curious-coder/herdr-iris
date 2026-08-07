@@ -34,6 +34,10 @@ Iris built its list once, when you opened it. Iris does not update that list on 
 
 Iris adds the right prefix for the agent: `/` for Claude, `$` for Codex. Iris types this text into the pane you opened Iris from. Iris does not press Enter for you. You choose when to run it.
 
+## Iris tells you when detection breaks
+
+Iris finds your focused pane through `herdr`. Iris needs `herdr` and `jq` to do this. If `herdr` is missing, or `jq` is missing, or Iris finds no focused pane, Iris cannot scope the list to your agent. Iris shows "degraded: ..." in the header for this case, with the reason. This message differs from Iris's normal unscoped mode. Iris shows no message in normal unscoped mode. Normal unscoped mode means: Iris found your pane, but herdr reports no agent for it.
+
 ## Iris hides a skill you turned off
 
 Claude Code hides a skill set to `"off"` in `skillOverrides`. Claude Code also refuses to run that skill by name. Iris checks the same setting before it builds the list. Iris checks your project settings first, then your personal settings. Iris hides an "off" skill the same way. Iris still shows a skill set to `"user-invocable-only"`. That setting exists for a person to type the skill's name by hand.

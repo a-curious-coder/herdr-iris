@@ -23,6 +23,7 @@ Press a key. Iris opens a list of skills. The list shows the skills for the agen
 - Edit a skill in your own editor (`o`), reload the list after (`Ctrl-R`)
 - Types the skill into your pane, doesn't run it for you (`Enter`)
 - Hides a skill you've turned off (`skillOverrides`)
+- Shows a clear "degraded" message in the header if detection breaks, instead of quietly acting unscoped
 
 Full detail on each of these: [FEATURES.md](FEATURES.md).
 
