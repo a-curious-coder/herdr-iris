@@ -4,8 +4,11 @@
 # `fmt` at the preview pane's actual width ($FZF_PREVIEW_COLUMNS, set by fzf)
 # because fzf's own --preview-window wrap is a character wrap, not a word
 # wrap, and was cutting words in half mid-line.
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+source "$script_dir/skill-row.sh"
+
 data_file="$1"
 name="$2"
 author="$3"
-desc=$(awk -F'\t' -v n="$name" -v a="$author" '$2 == n && $3 == a { print $4; exit }' "$data_file")
+desc=$(skill_row_field "$data_file" "$name" "$author" desc)
 printf '%s' "$desc" | fmt -w "${FZF_PREVIEW_COLUMNS:-60}"

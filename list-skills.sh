@@ -64,7 +64,7 @@ if command -v fzf >/dev/null 2>&1; then
   if [[ -n "${sel:-}" ]]; then
     author=$(awk '{print $1}' <<<"$sel")
     name=$(awk '{print $2}' <<<"$sel")
-    agent=$(awk -F'\t' -v n="$name" -v a="$author" '$2 == n && $3 == a { print $1; exit }' "$data_file")
+    agent=$(skill_row_field "$data_file" "$name" "$author" agent)
     prefix=$(prefix_for_agent "$agent")
     if [[ -n "$prefix" && -n "$origin_pane" ]]; then
       herdr pane send-text "$origin_pane" "${prefix}${name}" >/dev/null 2>&1 || true
